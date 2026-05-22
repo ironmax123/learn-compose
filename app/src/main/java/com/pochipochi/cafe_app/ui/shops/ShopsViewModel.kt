@@ -1,5 +1,6 @@
 package com.pochipochi.cafe_app.ui.shops
 
+import android.util.Log
 import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.lifecycle.ViewModel
 import com.pochipochi.cafe_app.data.model.ShopsModel
@@ -28,8 +29,8 @@ class ShopsViewModel: ViewModel() {
             val shops = shopsRepository.fetch()
             _state.value = _state.value.copy(shops = shops, isLoading = false)
         }catch (e: Exception){
-            print("店舗情報取得エラー:e.message")
-            _state.value = _state.value.copy(isLoading = false, error = "エラーが発生しました。しばらくしてからやり直してください。")
+            Log.d("ShopsViewModel", "店舗情報取得エラー: ${e.message}")
+            _state.value = _state.value.copy(isLoading = false, error = "エラーが発生しました。\nしばらくしてからやり直してください。")
         }
         }
     }
