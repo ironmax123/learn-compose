@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import androidx.lifecycle.viewModelScope
+import com.pochipochi.cafe_app.data.repository.SearchRepository
 
 data class ShopsState(
     val shops: List<ShopsModel> = emptyList(),
@@ -19,6 +20,7 @@ data class ShopsState(
 
 class ShopsViewModel: ViewModel() {
     private val shopsRepository = ShopsRepository()
+    private val searchRepository= SearchRepository()
     private val _state = MutableStateFlow(ShopsState())
     val state: StateFlow<ShopsState> = _state.asStateFlow()
 
@@ -32,6 +34,19 @@ class ShopsViewModel: ViewModel() {
             Log.d("ShopsViewModel", "店舗情報取得エラー: ${e.message}")
             _state.value = _state.value.copy(isLoading = false, error = "エラーが発生しました。\nしばらくしてからやり直してください。")
         }
+        }
+    }
+
+    fun searchShops(query:String){
+        viewModelScope.launch {
+            _state.value = _state.value.copy(isLoading = true, error = null)
+            try {
+                val shops = searchRepository.search(query = query)
+                _state.value = _state.value.copy(shops = shops, isLoading = false)
+            }catch (e: Exception){
+                Log.d("ShopsViewModel", "店舗情報取得エラー: ${e.message}")
+                _state.value = _state.value.copy(isLoading = false, error = "エラーが発生しました。\nしばらくしてからやり直してください。")
+            }
         }
     }
 }
