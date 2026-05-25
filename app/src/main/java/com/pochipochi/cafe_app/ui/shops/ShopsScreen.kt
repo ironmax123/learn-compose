@@ -36,7 +36,7 @@ import com.pochipochi.cafe_app.ui.shops.components.ShopsSearch
 
 @Composable
 @ExperimentalMaterial3ExpressiveApi
-fun ShopsScreen(viewModel: ShopsViewModel = viewModel()) {
+fun ShopsScreen(viewModel: ShopsViewModel = viewModel(), onNavigateToDetail: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
@@ -69,23 +69,26 @@ fun ShopsScreen(viewModel: ShopsViewModel = viewModel()) {
                     .safeDrawingPadding()
             ) {
                 ShopsSearch(viewModel)
-            LazyColumn( modifier = Modifier.fillMaxSize()) {
-                items(state.shops.size) { index ->
-                    ShopsItem(state.shops[index])
-                    HorizontalDivider(thickness = 2.dp)
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(state.shops.size) { index ->
+                        ShopsItem(state.shops[index], onClick = {
+                            onNavigateToDetail()
+                        })
+                        HorizontalDivider(thickness = 2.dp)
+                    }
                 }
-            }
             }
         }
     }
 }
 
 @Composable
-fun ShopsItem(shops: ShopsModel) {
-    Column(Modifier
-        .padding(20.dp)
-        .clickable(onClick = {})
-    ){
+fun ShopsItem(shops: ShopsModel, onClick: () -> Unit) {
+    Column(
+        Modifier
+            .padding(20.dp)
+            .clickable(onClick = onClick)
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -104,19 +107,19 @@ fun ShopsItem(shops: ShopsModel) {
             )
         }
 
-    Text(
-        text = shops.description,
-        fontSize = 16.sp
-    )
+        Text(
+            text = shops.description,
+            fontSize = 16.sp
+        )
 
-    Text(
-        text = shops.phone,
-        fontSize = 14.sp
-    )
+        Text(
+            text = shops.phone,
+            fontSize = 14.sp
+        )
 
-    Text(
-        text = shops.address,
-        fontSize = 14.sp
-    )
+        Text(
+            text = shops.address,
+            fontSize = 14.sp
+        )
     }
 }
