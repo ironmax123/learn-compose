@@ -68,7 +68,7 @@ fun ShopsScreen(viewModel: ShopsViewModel = viewModel(), onNavigateToDetail: () 
                     .fillMaxSize()
                     .safeDrawingPadding()
             ) {
-                ShopsSearch(viewModel)
+                ShopsSearch(viewModel = viewModel)
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(state.shops.size) { index ->
                         ShopsItem(state.shops[index], onClick = {

@@ -1,7 +1,6 @@
 package com.pochipochi.cafe_app.ui.menu
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,14 +9,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.AppBarWithSearch
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExpandedFullScreenSearchBar
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -34,14 +38,18 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularWavyProgressIndicator
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.pochipochi.cafe_app.data.model.ProductsModel
+import com.pochipochi.cafe_app.ui.menu.components.MenuDrawerComponent
 import kotlinx.coroutines.launch
 
 @Composable
@@ -55,6 +63,7 @@ fun MenuScreen(viewModel: MenuViewModel = viewModel(), onBack: () -> Unit) {
     val searchBarState = rememberSearchBarState()
     val scrollBehavior = SearchBarDefaults.enterAlwaysSearchBarScrollBehavior()
     val scope = rememberCoroutineScope()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     val inputField: @Composable () -> Unit = {
         SearchBarDefaults.InputField(
@@ -71,71 +80,116 @@ fun MenuScreen(viewModel: MenuViewModel = viewModel(), onBack: () -> Unit) {
         )
     }
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            AppBarWithSearch(
-                scrollBehavior = scrollBehavior,
-                state = searchBarState,
-                inputField = inputField,
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "戻る"
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* TODO: カート画面へ遷移 */ }) {
-                        Icon(
-                            imageVector = Icons.Default.ShoppingCart,
-                            contentDescription = "カート"
-                        )
-                    }
-                }
-            )
-
-        }
-    ) { innerPadding ->
-        when {
-            state.isLoading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularWavyProgressIndicator()
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                    MenuDrawerComponent(
+                        drawerState = drawerState,
+                        viewModel = viewModel
+                    )
                 }
             }
-
-            state.error != null -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(state.error.orEmpty())
-                }
-            }
-
-            else ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                ) {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(state.menu.size) { index ->
-                            MenuItem(menus = state.menu[index])
-                            HorizontalDivider(thickness = 2.dp)
+        ) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                Scaffold(
+                    modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+                    topBar = {
+                        AppBarWithSearch(
+                            scrollBehavior = scrollBehavior,
+                            state = searchBarState,
+                            inputField = inputField,
+                            navigationIcon = {
+                                IconButton(onClick = onBack) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = "戻る"
+                                    )
+                                }
+                            },
+                            actions = {
+                                IconButton(
+                                    onClick = {
+                                        scope.launch {
+                                            drawerState.open()
+                                        }
+                                    }
+                                ) {
+                                    Box(
+                                        modifier = Modifier.size(32.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.ShoppingCart,
+                                            contentDescription = "カート"
+                                        )
+                                        if (state.cartItems.isNotEmpty()) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .align(Alignment.TopStart)
+                                                    .size(18.dp)
+                                                    .background(
+                                                        color = Color.Red,
+                                                        shape = CircleShape
+                                                    ),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = state.cartItems.size.toString(),
+                                                    color = Color.White,
+                                                    fontSize = 10.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    }
+                ) { innerPadding ->
+                    when {
+                        state.isLoading -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularWavyProgressIndicator()
+                            }
                         }
+
+                        state.error != null -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(state.error.orEmpty())
+                            }
+                        }
+
+                        else ->
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(innerPadding)
+                            ) {
+                                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                                    items(state.menu.size) { index ->
+                                        MenuItem(menus = state.menu[index], viewModel = viewModel)
+                                        HorizontalDivider(thickness = 2.dp)
+                                    }
+                                }
+                            }
                     }
                 }
+            }
         }
     }
 }
 
 @Composable
-fun MenuItem(menus: ProductsModel) {
+fun MenuItem(menus: ProductsModel, viewModel: MenuViewModel = viewModel()) {
     Column(
         modifier = Modifier
             .padding(20.dp),
@@ -175,11 +229,10 @@ fun MenuItem(menus: ProductsModel) {
             fontSize = 16.sp,
         )
         Button(
-            onClick = {},
+            onClick = { viewModel.cart(menus.id) },
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Text("カートに追加")
         }
     }
 }
-
