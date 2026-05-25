@@ -3,6 +3,8 @@ package com.pochipochi.cafe_app.ui.shops.components
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -29,7 +31,7 @@ fun ShopsSearch(viewModel: ShopsViewModel) {
         onValueChange = { query = it },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp),
+            .padding(horizontal = 20.dp, vertical = 14.dp),
         placeholder = { Text("検索") },
         leadingIcon = {
             Icon(
