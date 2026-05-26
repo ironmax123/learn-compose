@@ -57,7 +57,12 @@ import kotlinx.coroutines.launch
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun MenuScreen(viewModel: MenuViewModel = viewModel(), onBack: () -> Unit) {
+fun MenuScreen(
+    viewModel: MenuViewModel = viewModel(),
+    onBack: () -> Unit,
+    onNavigateCheck: (List<ProductsModel>, Int) -> Unit,
+    shopName: String
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
         viewModel.fetchMenu()
@@ -99,7 +104,8 @@ fun MenuScreen(viewModel: MenuViewModel = viewModel(), onBack: () -> Unit) {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     MenuDrawerComponent(
                         drawerState = drawerState,
-                        viewModel = viewModel
+                        viewModel = viewModel,
+                        onNavigateCheck = onNavigateCheck
                     )
                 }
             }

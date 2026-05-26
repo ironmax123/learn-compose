@@ -20,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,7 +37,7 @@ import com.pochipochi.cafe_app.ui.shops.components.ShopsSearch
 
 @Composable
 @ExperimentalMaterial3ExpressiveApi
-fun ShopsScreen(viewModel: ShopsViewModel = viewModel(), onNavigateToMenu: () -> Unit) {
+fun ShopsScreen(viewModel: ShopsViewModel = viewModel(), onNavigateToMenu: (String) -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
@@ -68,12 +69,17 @@ fun ShopsScreen(viewModel: ShopsViewModel = viewModel(), onNavigateToMenu: () ->
                     .fillMaxSize()
                     .safeDrawingPadding()
             ) {
-                Text("注文する店舗を選択")
+                Text(
+                    text = "注文する店舗",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
+                )
                 ShopsSearch(viewModel = viewModel)
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(state.shops.size) { index ->
                         ShopsItem(state.shops[index], onClick = {
-                            onNavigateToMenu()
+                            onNavigateToMenu(state.shops[index].name)
                         })
                         HorizontalDivider(thickness = 2.dp)
                     }

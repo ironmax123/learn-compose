@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.DrawerState
@@ -23,18 +24,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pochipochi.cafe_app.data.model.ProductsModel
 import com.pochipochi.cafe_app.ui.menu.MenuViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun MenuDrawerComponent(
     drawerState: DrawerState,
-    viewModel: MenuViewModel = viewModel()
+    viewModel: MenuViewModel = viewModel(),
+    onNavigateCheck: (List<ProductsModel>, Int) -> Unit
 ) {
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val state by viewModel.state.collectAsState()
     ModalDrawerSheet {
@@ -82,7 +87,9 @@ fun MenuDrawerComponent(
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.size(16.dp))
-                Button(onClick = {}) {
+                Button(onClick = {
+                    onNavigateCheck(state.cartItems, state.cartTotalAmount)
+                }) {
                     Text("会計に進む")
                 }
             }
@@ -98,11 +105,23 @@ fun MenuDrawerComponent(
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    Text(
-                        text = "¥${state.cartItems[index].price}",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "¥${state.cartItems[index].price}",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.size(16.dp))
+                        IconButton(onClick = {
+                            viewModel.cancel(id = state.cartItems[index].id)
+                            viewModel.showToast(context = context, "削除しました")
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "閉じる"
+                            )
+                        }
+                    }
                     HorizontalDivider(thickness = 1.dp)
                 }
             }

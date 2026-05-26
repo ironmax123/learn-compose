@@ -78,6 +78,25 @@ class MenuViewModel : ViewModel() {
         }
     }
 
+    fun cancel(id: String) {
+        viewModelScope.launch {
+            try {
+                val product = _cartState.firstOrNull { it.id == id } ?: return@launch
+                _cartState.remove(product)
+                _state.value = _state.value.copy(
+                    cartItems = _cartState,
+                    cartTotalAmount = _cartState.sumOf { it.price })
+
+            } catch (e: Exception) {
+                Log.d("ShopsViewModel", "カートエラー: ${e.message}")
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    error = "エラーが発生しました。\nしばらくしてからやり直してください。"
+                )
+            }
+        }
+    }
+
     fun showToast(context: android.content.Context, message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
