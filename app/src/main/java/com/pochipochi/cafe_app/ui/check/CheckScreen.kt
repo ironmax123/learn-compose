@@ -13,6 +13,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,48 +49,50 @@ fun CheckScreen(
             }
         )
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .safeDrawingPadding()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        OutlinedButton(
-            onClick = onBack,
-            modifier = Modifier.align(Alignment.Start)
+    Surface(color = MaterialTheme.colorScheme.background) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .safeDrawingPadding()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("会計をキャンセルする")
-        }
-        Text(
-            text = shopName,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            text = "合計金額  ¥$amount",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            items(cartItem.size) { index ->
-                Text(
-                    text = "${cartItem[index].name} | ¥${cartItem[index].price}",
-                    modifier = Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+            OutlinedButton(
+                onClick = onBack,
+                modifier = Modifier.align(Alignment.Start)
+            ) {
+                Text("会計をキャンセルする")
             }
-        }
-        HorizontalDivider(thickness = 1.dp)
-        Button(
-            onClick = { showWalletSheet = true },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("ウォレットで支払う")
+            Text(
+                text = shopName,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "合計金額  ¥$amount",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                items(cartItem.size) { index ->
+                    Text(
+                        text = "${cartItem[index].name} | ¥${cartItem[index].price}",
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
+            Button(
+                onClick = { showWalletSheet = true },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("ウォレットで支払う")
+            }
         }
     }
 

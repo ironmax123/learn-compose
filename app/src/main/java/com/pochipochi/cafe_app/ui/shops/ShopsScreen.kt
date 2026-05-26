@@ -22,11 +22,13 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,42 +48,54 @@ fun ShopsScreen(viewModel: ShopsViewModel = viewModel(), onNavigateToMenu: (Stri
 
     when {
         state.isLoading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularWavyProgressIndicator()
+            Surface(color = MaterialTheme.colorScheme.background) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularWavyProgressIndicator()
+                }
             }
         }
 
         state.error != null -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(state.error.orEmpty())
+            Surface(color = MaterialTheme.colorScheme.background) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = state.error.orEmpty(),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         }
 
         else -> {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .safeDrawingPadding()
-            ) {
-                Text(
-                    text = "注文する店舗",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
-                )
-                ShopsSearch(viewModel = viewModel)
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(state.shops.size) { index ->
-                        ShopsItem(state.shops[index], onClick = {
-                            onNavigateToMenu(state.shops[index].name)
-                        })
-                        HorizontalDivider(thickness = 2.dp)
+            Surface(color = MaterialTheme.colorScheme.background) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .safeDrawingPadding()
+                ) {
+                    Text(
+                        text = "注文する店舗",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
+                    )
+                    ShopsSearch(viewModel = viewModel)
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(state.shops.size) { index ->
+                            ShopsItem(state.shops[index], onClick = {
+                                onNavigateToMenu(state.shops[index].name)
+                            })
+                            HorizontalDivider(
+                                thickness = 2.dp,
+                                color = MaterialTheme.colorScheme.outlineVariant
+                            )
+                        }
                     }
                 }
             }
@@ -103,30 +117,35 @@ fun ShopsItem(shops: ShopsModel, onClick: () -> Unit) {
             Text(
                 text = shops.name,
                 fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(modifier = Modifier.weight(1f))
 
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "メニュー選択"
+                contentDescription = "メニュー選択",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
         Text(
             text = shops.description,
-            fontSize = 16.sp
+            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Text(
             text = shops.phone,
-            fontSize = 14.sp
+            fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Text(
             text = shops.address,
-            fontSize = 14.sp
+            fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

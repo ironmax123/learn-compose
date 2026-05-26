@@ -28,7 +28,7 @@ fun WalletPaymentDialog(
         Surface(
             shape = MaterialTheme.shapes.medium,
             tonalElevation = 6.dp,
-            color = MaterialTheme.colorScheme.surface
+            color = MaterialTheme.colorScheme.surfaceContainer
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
