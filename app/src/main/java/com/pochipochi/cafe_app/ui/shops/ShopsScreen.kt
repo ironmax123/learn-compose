@@ -36,7 +36,7 @@ import com.pochipochi.cafe_app.ui.shops.components.ShopsSearch
 
 @Composable
 @ExperimentalMaterial3ExpressiveApi
-fun ShopsScreen(viewModel: ShopsViewModel = viewModel(), onNavigateToDetail: () -> Unit) {
+fun ShopsScreen(viewModel: ShopsViewModel = viewModel(), onNavigateToMenu: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
@@ -68,11 +68,12 @@ fun ShopsScreen(viewModel: ShopsViewModel = viewModel(), onNavigateToDetail: () 
                     .fillMaxSize()
                     .safeDrawingPadding()
             ) {
+                Text("注文する店舗を選択")
                 ShopsSearch(viewModel = viewModel)
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(state.shops.size) { index ->
                         ShopsItem(state.shops[index], onClick = {
-                            onNavigateToDetail()
+                            onNavigateToMenu()
                         })
                         HorizontalDivider(thickness = 2.dp)
                     }

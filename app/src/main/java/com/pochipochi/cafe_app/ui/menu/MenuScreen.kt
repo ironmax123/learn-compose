@@ -6,45 +6,48 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.AppBarWithSearch
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExpandedFullScreenSearchBar
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
@@ -65,17 +68,26 @@ fun MenuScreen(viewModel: MenuViewModel = viewModel(), onBack: () -> Unit) {
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
+
     val inputField: @Composable () -> Unit = {
         SearchBarDefaults.InputField(
+            modifier = Modifier.fillMaxWidth(),
             searchBarState = searchBarState,
             textFieldState = textFieldState,
             onSearch = {
                 scope.launch {
                     searchBarState.animateToCollapsed()
                 }
+                viewModel.searchQuery(textFieldState.text.toString())
             },
             placeholder = {
                 Text("メニューを検索")
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "検索"
+                )
             }
         )
     }
@@ -147,6 +159,17 @@ fun MenuScreen(viewModel: MenuViewModel = viewModel(), onBack: () -> Unit) {
                                 }
                             }
                         )
+                        ExpandedFullScreenSearchBar(
+                            state = searchBarState,
+                            inputField = inputField
+                        ) {
+                            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                                items(state.menu.size) { index ->
+                                    MenuItem(menus = state.menu[index], viewModel = viewModel)
+                                    HorizontalDivider(thickness = 2.dp)
+                                }
+                            }
+                        }
                     }
                 ) { innerPadding ->
                     when {
@@ -190,6 +213,7 @@ fun MenuScreen(viewModel: MenuViewModel = viewModel(), onBack: () -> Unit) {
 
 @Composable
 fun MenuItem(menus: ProductsModel, viewModel: MenuViewModel = viewModel()) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .padding(20.dp),
@@ -212,6 +236,7 @@ fun MenuItem(menus: ProductsModel, viewModel: MenuViewModel = viewModel()) {
             Spacer(modifier = Modifier.size(14.dp))
             Text(
                 text = menus.category,
+                color = Color.Black,
                 modifier = Modifier
                     .background(
                         color = when (menus.category) {
@@ -229,7 +254,10 @@ fun MenuItem(menus: ProductsModel, viewModel: MenuViewModel = viewModel()) {
             fontSize = 16.sp,
         )
         Button(
-            onClick = { viewModel.cart(menus.id) },
+            onClick = {
+                viewModel.cart(menus.id)
+                viewModel.showToast(context, "カートに追加しました")
+            },
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Text("カートに追加")

@@ -18,13 +18,13 @@ fun AppRouter() {
     ) {
         composable(Routes.Shops) {
             ShopsScreen(
-                onNavigateToDetail = {
-                    navController.navigate(Routes.Detail)
+                onNavigateToMenu = {
+                    navController.navigate(Routes.Menu)
                 }
             )
         }
 
-        composable(Routes.Detail) {
+        composable(Routes.Menu) {
             MenuScreen(
                 onBack = {
                     navController.popBackStack()
@@ -36,5 +36,5 @@ fun AppRouter() {
 
 object Routes {
     const val Shops = "shops"
-    const val Detail = "detail"
+    const val Menu = "detail"
 }

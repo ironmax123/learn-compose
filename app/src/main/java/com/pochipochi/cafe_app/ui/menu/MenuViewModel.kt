@@ -1,6 +1,7 @@
 package com.pochipochi.cafe_app.ui.menu
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,7 +25,6 @@ class MenuViewModel : ViewModel() {
     private val productsRepository = ProductsRepository()
     private val _state = MutableStateFlow(MenuState())
     private val _cartState = mutableStateListOf<ProductsModel>()
-    val cartState: List<ProductsModel> = _cartState
     val state: StateFlow<MenuState> = _state.asStateFlow()
 
     fun fetchMenu() {
@@ -61,5 +61,24 @@ class MenuViewModel : ViewModel() {
                 )
             }
         }
+    }
+
+    fun searchQuery(query: String) {
+        viewModelScope.launch {
+            try {
+                val result = productsRepository.searchQuery(query)
+                _state.value = _state.value.copy(menu = result)
+            } catch (e: Exception) {
+                Log.d("ShopsViewModel", "カートエラー: ${e.message}")
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    error = "エラーが発生しました。\nしばらくしてからやり直してください。"
+                )
+            }
+        }
+    }
+
+    fun showToast(context: android.content.Context, message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 }

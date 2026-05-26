@@ -15,4 +15,20 @@ class ProductsRepository {
         Log.d("response", "response:$response")
         return response.data
     }
+
+    suspend fun searchQuery(query: String): List<ProductsModel> {
+        val response: ProductsResponseDto =
+            NetworkClient.client.get("https://cafe-api.flutterapp-dev-12345.workers.dev/api/products?q=$query")
+                .body()
+        Log.d("response", "response:$response")
+        return response.data
+    }
+
+    suspend fun searchCategory(category: String): List<ProductsModel> {
+        val response: ProductsResponseDto =
+            NetworkClient.client.get("https://cafe-api.flutterapp-dev-12345.workers.dev/api/products?category=$category")
+                .body()
+        Log.d("response", "response:$response")
+        return response.data
+    }
 }
